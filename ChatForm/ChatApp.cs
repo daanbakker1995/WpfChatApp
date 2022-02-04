@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ChatForm
 {
-    public class ChatApp
+    public abstract class ChatApp
     {
         // Settings for server
         protected int PortNumber { get; set; }
@@ -13,8 +13,17 @@ namespace ChatForm
         protected readonly string ENDOFTRANSITIONCHARACTER = "@-_@";
 
         // Delegates/Actions to update UI
-        protected Action<string> AddMessageToChat;
-        protected Action ToggleStartButton;
+        protected Action<string> AddMessageToChatAction;
+        protected Action ToggleStartButtonAction;
+
+        protected ChatApp(int PortNumber, int BufferSize, string Ipaddres, Action<string> AddMessageToChatAction, Action ToggleStartButtonAction)
+        {
+            this.PortNumber = PortNumber;
+            this.BufferSize = BufferSize;
+            this.Ipaddres = Ipaddres;
+            this.AddMessageToChatAction = AddMessageToChatAction;
+            this.ToggleStartButtonAction = ToggleStartButtonAction;
+        }
 
         /// <summary>
         /// Sends message to connected server
@@ -34,7 +43,7 @@ namespace ChatForm
             }
             catch (Exception)
             {
-                AddMessageToChat("Fout bij versturen bericht");
+                AddMessageToChatAction("Fout bij versturen bericht");
             }
         }
     }

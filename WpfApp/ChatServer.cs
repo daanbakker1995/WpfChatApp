@@ -11,15 +11,12 @@ namespace WpfAppServer
 {
     class ChatServer : ChatApp
     {
-
         // TcpListener for listening for clients
         private TcpListener TcpListener = null;
-
         // List of TcpCLients
-        private List<TcpClient> TcpClients;
-
+        private List<TcpClient> TcpClients = new();
         // boolean holding the Server Status
-        private bool ServerStarted { get; set; }
+        private bool ServerStarted { get; set; } = false;
 
         /// <summary>
         /// Constructor
@@ -29,16 +26,8 @@ namespace WpfAppServer
         /// <param name="IPAdress"></param>
         /// <param name="AddMessageToChat"></param>
         /// <param name="ToggleStartButton"></param>
-        public ChatServer(int PortNr, int BuffferSize, string IPAdress, Action<string> AddMessageToChat, Action ToggleStartButton)
+        public ChatServer(int PortNumber, int BufferSize, string Ipaddres, Action<string> AddMessageToChatAction, Action ToggleStartButton) : base(PortNumber, BufferSize, Ipaddres, AddMessageToChatAction, ToggleStartButton)
         {
-            PortNumber = PortNr;
-            BufferSize = BuffferSize;
-            Ipaddres = IPAdress;
-            this.AddMessageToChat = AddMessageToChat;
-            this.ToggleStartButton = ToggleStartButton;
-
-            ServerStarted = false;
-            TcpClients = new List<TcpClient>();
         }
 
         public void StartListening()
@@ -48,7 +37,7 @@ namespace WpfAppServer
                 ServerStarted = true;
                 TcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
                 TcpListener.Start();
-                AddMessageToChat("Luisteren naar chatclients...");
+                AddMessageToChatAction("Luisteren naar chatclients...");
                 TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener); // TODO: Make task
             }
             catch (Exception e)
@@ -65,7 +54,6 @@ namespace WpfAppServer
 
             try
             {
-                if (!ServerStarted) return;
                 TcpClients.Add(tcpClient);
                 TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
                 await Task.Run(() => ReceiveData(tcpClient));
@@ -73,7 +61,7 @@ namespace WpfAppServer
             catch (Exception e)
             {
                 // Add exception to chat if server started and an exception caught
-                if (ServerStarted) AddMessageToChat("AcceptClients error:" + e.Message);
+                if (ServerStarted) AddMessageToChatAction("AcceptClients error:" + e.Message);
             }
 
         }
@@ -86,7 +74,7 @@ namespace WpfAppServer
             try
             {
                 // Send feedback to server UI
-                AddMessageToChat("Nieuwe chat deelnemer!");
+                AddMessageToChatAction("Nieuwe chat deelnemer!");
                 while (networkStream != null && networkStream.CanRead)
                 {
                     // Receive data from stream
@@ -104,7 +92,7 @@ namespace WpfAppServer
                     clientMessage = clientMessage.Remove(clientMessage.Length - ENDOFTRANSITIONCHARACTER.Length);
                     if (clientMessage == "bye") break;
                     // Display message in chat
-                    AddMessageToChat(clientMessage);
+                    AddMessageToChatAction(clientMessage);
                     // Send message to other connected clients
                     BroadCast(clientMessage, tcpClient);
                     stringBuilder.Clear();
@@ -117,7 +105,7 @@ namespace WpfAppServer
             {
                 if (!networkStream.CanRead) return;
                 // Send error to chat and remove client
-                AddMessageToChat($"Fout bij ontvangen bericht(en)");
+                AddMessageToChatAction($"Fout bij ontvangen bericht(en)");
                 RemoveClient(tcpClient);
 
             }
@@ -148,7 +136,7 @@ namespace WpfAppServer
         /// <param name="client"></param>
         private void RemoveClient(TcpClient client)
         {
-            AddMessageToChat("Een client heeft chat verlaten");
+            AddMessageToChatAction("Een client heeft chat verlaten");
             // Close client and remove from List
             client.Close();
             TcpClients.Remove(client);
@@ -166,8 +154,8 @@ namespace WpfAppServer
             // Reset list
             TcpClients.Clear();
             // Update UI
-            ToggleStartButton();
-            AddMessageToChat("Verbinding gesloten..");
+            ToggleStartButtonAction();
+            AddMessageToChatAction("Verbinding gesloten..");
         }
     }
 }

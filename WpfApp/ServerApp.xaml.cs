@@ -59,13 +59,6 @@ namespace WpfApp
             }
         }
 
-        private bool FieldsAreValid()
-        {
-            return ChatValidator.IsValidIP(InputServerIP.Text) &&
-                ChatValidator.IsValidPortNumber(InputPortNumber.Text) &&
-                ChatValidator.IsValidBufferSize(InputBufferSize.Text);
-        }
-
         /// <summary>
         /// <c>Event_Handler</c> BtnSendMessage Click
         /// </summary>

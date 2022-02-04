@@ -12,7 +12,7 @@ namespace WpfAppClient
         private TcpClient Client { get; set; }
 
         // boolean holding the connection status
-        private bool ConnectedToServer { get; set; }
+        private bool ConnectedToServer { get; set; } = false;
 
         /// <summary>
         /// Contstructor
@@ -22,16 +22,8 @@ namespace WpfAppClient
         /// <param name="IPAdress"></param>
         /// <param name="AddMessageToChat"></param>
         /// <param name="ToggleStartButton"></param>
-        public ChatClient(int PortNr, int BuffferSize, String IPAdress, Action<String> AddMessageToChat, Action ToggleStartButton)
-        {   // Initialize Variables
-            PortNumber = PortNr;
-            BufferSize = BuffferSize;
-            Ipaddres = IPAdress;
-            // Initialize Delegates
-            this.AddMessageToChat = AddMessageToChat;
-            this.ToggleStartButton = ToggleStartButton;
-            // Server Setting
-            ConnectedToServer = false;
+        public ChatClient(int PortNumber, int BufferSize, string Ipaddres, Action<string> AddMessageToChatAction, Action ToggleStartButton) : base(PortNumber, BufferSize, Ipaddres, AddMessageToChatAction, ToggleStartButton)
+        {
         }
 
         /// <summary>
@@ -43,7 +35,7 @@ namespace WpfAppClient
             {
                 Client = new TcpClient(Ipaddres, PortNumber);
                 // send feedback to chat
-                AddMessageToChat("Verbonden!");
+                AddMessageToChatAction("Verbonden!");
                 ConnectedToServer = true;
                 // Make Client receivve data from server
                 await Task.Run(() => ReceiveData());
@@ -51,9 +43,9 @@ namespace WpfAppClient
             }
             catch (Exception)
             {
-                AddMessageToChat("Fout bij maken connectie.");
+                AddMessageToChatAction("Fout bij maken connectie.");
                 ConnectedToServer = false;
-                ToggleStartButton();
+                ToggleStartButtonAction();
             }
         }
 
@@ -86,7 +78,7 @@ namespace WpfAppClient
                     if (clientMessage == "bye")
                         break;
                     // Display message in chat
-                    AddMessageToChat(clientMessage);
+                    AddMessageToChatAction(clientMessage);
                     // Empty stringBuilder for new message
                     stringBuilder = new StringBuilder();
                 }
@@ -96,7 +88,7 @@ namespace WpfAppClient
             {
                 if (!ConnectedToServer) return;
                 // Send error to chat and close connection
-                AddMessageToChat("Onverwachte server fout");
+                AddMessageToChatAction("Onverwachte server fout");
                 CloseConnection();
             }
         }
@@ -121,8 +113,8 @@ namespace WpfAppClient
             Client.Close();
             Client.Dispose();
             // Update UI
-            ToggleStartButton();
-            AddMessageToChat("Connectie gesloten");
+            ToggleStartButtonAction();
+            AddMessageToChatAction("Connectie gesloten");
         }
     }
 
