@@ -1,0 +1,99 @@
+{
+  "version": 3,
+  "targets": {
+    "net5.0-windows7.0": {
+      "ChatForm/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/ChatForm.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ChatForm.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ChatForm/1.0.0": {
+      "type": "project",
+      "path": "../ChatForm/ChatForm.csproj",
+      "msbuildProject": "../ChatForm/ChatForm.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net5.0-windows7.0": [
+      "ChatForm >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Daan\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Daan\\Downloads\\WPF_MultiChat_TCP-main\\WPF_MultiChat_TCP-main\\WpfApp\\WpfAppServer.csproj",
+      "projectName": "WpfAppServer",
+      "projectPath": "C:\\Users\\Daan\\Downloads\\WPF_MultiChat_TCP-main\\WPF_MultiChat_TCP-main\\WpfApp\\WpfAppServer.csproj",
+      "packagesPath": "C:\\Users\\Daan\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Daan\\Downloads\\WPF_MultiChat_TCP-main\\WPF_MultiChat_TCP-main\\WpfApp\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Daan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net5.0-windows7.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nexus.infocaster.net/repository/infocaster-nuget-group/": {},
+        "http://nexus.infocaster.net/repository/infocaster-nuget/": {},
+        "http://nexus.infocaster.net/repository/platform-nuget/": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://pkgs.dev.azure.com/infocaster/KantoorProfi/_packaging/kantoorprofi/nuget/v3/index.json": {},
+        "https://pkgs.dev.azure.com/infocaster/_packaging/Umbraco-Awesome/nuget/v3/index.json": {},
+        "https://www.myget.org/F/umbraco-packages/api/v3/index.json": {}
+      },
+      "frameworks": {
+        "net5.0-windows7.0": {
+          "targetAlias": "net5.0-windows",
+          "projectReferences": {
+            "C:\\Users\\Daan\\Downloads\\WPF_MultiChat_TCP-main\\WPF_MultiChat_TCP-main\\ChatForm\\ChatForm.csproj": {
+              "projectPath": "C:\\Users\\Daan\\Downloads\\WPF_MultiChat_TCP-main\\WPF_MultiChat_TCP-main\\ChatForm\\ChatForm.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net5.0-windows7.0": {
+        "targetAlias": "net5.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WPF": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
