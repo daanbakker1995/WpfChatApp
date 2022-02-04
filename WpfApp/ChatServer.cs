@@ -49,28 +49,25 @@ namespace WpfAppServer
                 TcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
                 TcpListener.Start();
                 AddMessageToChat("Luisteren naar chatclients...");
-                TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener); // Make task
+                TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener); // TODO: Make task
             }
             catch (Exception e)
             {
+                ServerStarted = false;
                 throw new Exception($"Server Error: {e.Message}");
             }
         }
 
         private async void AcceptClients(IAsyncResult result)
         {
-            if (!ServerStarted) return;
+            if (!ServerStarted) return; // Return if server is not started
             using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the TcpListener
 
             try
             {
-                // Check if server is not closed
                 if (!ServerStarted) return;
-                // Add Client to list of clients
                 TcpClients.Add(tcpClient);
-                // Listen for new client to connect
                 TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
-                // Receive data on net Taks
                 await Task.Run(() => ReceiveData(tcpClient));
             }
             catch (Exception e)
@@ -112,19 +109,17 @@ namespace WpfAppServer
                     BroadCast(clientMessage, tcpClient);
                     stringBuilder.Clear();
                 }
-                if (!networkStream.CanRead)
-                {
-                    RemoveClient(tcpClient);
-                }
+                // Loop is broken so it can't read, remove client.
+                if (networkStream.CanRead) RemoveClient(tcpClient);
+
             }
             catch (Exception)
             {
-                if (networkStream.CanRead)
-                {
-                    // Send error to chat and remove client
-                    AddMessageToChat($"Fout bij ontvangen bericht(en)");
-                    RemoveClient(tcpClient);
-                }
+                if (!networkStream.CanRead) return;
+                // Send error to chat and remove client
+                AddMessageToChat($"Fout bij ontvangen bericht(en)");
+                RemoveClient(tcpClient);
+
             }
         }
 
@@ -153,7 +148,7 @@ namespace WpfAppServer
         /// <param name="client"></param>
         private void RemoveClient(TcpClient client)
         {
-            AddMessageToChat("Client heeft chat verlaten");
+            AddMessageToChat("Een client heeft chat verlaten");
             // Close client and remove from List
             client.Close();
             TcpClients.Remove(client);

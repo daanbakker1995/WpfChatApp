@@ -6,6 +6,13 @@ namespace ChatForm
 {
     public static class ChatValidator
     {
+        public static bool FieldsAreValid(string IpAdress, string Portnumber, string Buffersize)
+        {
+            return IsValidIP(IpAdress) &&
+                IsValidPortNumber(Portnumber) &&
+                IsValidBufferSize(Buffersize);
+        }
+
         /// <summary>
         /// Checks if given string can be converted into an int and is its a valid number based on <code>IsValidPortNumber</code>
         /// </summary>

@@ -23,11 +23,11 @@ namespace WpfAppClient
         /// <param name="AddMessageToChat"></param>
         /// <param name="ToggleStartButton"></param>
         public ChatClient(int PortNr, int BuffferSize, String IPAdress, Action<String> AddMessageToChat, Action ToggleStartButton)
-        {   // Variables
+        {   // Initialize Variables
             PortNumber = PortNr;
             BufferSize = BuffferSize;
             Ipaddres = IPAdress;
-            // Delegates
+            // Initialize Delegates
             this.AddMessageToChat = AddMessageToChat;
             this.ToggleStartButton = ToggleStartButton;
             // Server Setting
@@ -41,14 +41,13 @@ namespace WpfAppClient
         {
             try
             {
-                using (Client = new TcpClient(Ipaddres, PortNumber))
-                {
-                    // send feedback to chat
-                    AddMessageToChat("Verbonden!");
-                    ConnectedToServer = true;
-                    // Make Client receivve data from server
-                    await Task.Run(() => ReceiveData());
-                }
+                Client = new TcpClient(Ipaddres, PortNumber);
+                // send feedback to chat
+                AddMessageToChat("Verbonden!");
+                ConnectedToServer = true;
+                // Make Client receivve data from server
+                await Task.Run(() => ReceiveData());
+
             }
             catch (Exception)
             {
@@ -63,7 +62,6 @@ namespace WpfAppClient
         /// </summary>
         private void ReceiveData()
         {
-            // Using streamwriter from the TCP Server
             using NetworkStream networkStream = Client.GetStream();
             try
             {
@@ -75,36 +73,31 @@ namespace WpfAppClient
                     string message = Encoding.ASCII.GetString(byteArray, 0, resultSize);
 
                     // Make one message from received bytes
-                    StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder stringBuilder = new();
                     stringBuilder.Append(message);
 
-                    //end of Message
-                    if (message.EndsWith(ENDOFTRANSITIONCHARACTER))
-                    {
-                        // Make message readable
-                        string clientMessage = stringBuilder.ToString();
-                        clientMessage = clientMessage.Remove(clientMessage.Length - ENDOFTRANSITIONCHARACTER.Length);
-                        if (clientMessage == "bye")
-                            break;
-                        // Display message in chat
-                        AddMessageToChat(clientMessage);
-                        // Empty stringBuilder for new message
-                        stringBuilder = new StringBuilder();
-                    }
+                    // if end of message is not end of transmition character continue to receive data.
+                    if (!message.EndsWith(ENDOFTRANSITIONCHARACTER)) continue;
+
+                    // Make message readable
+                    string clientMessage = stringBuilder.ToString();
+                    clientMessage = clientMessage.Remove(clientMessage.Length - ENDOFTRANSITIONCHARACTER.Length);
+                    // If received message is bye the server is closed so the client so break connection.
+                    if (clientMessage == "bye")
+                        break;
+                    // Display message in chat
+                    AddMessageToChat(clientMessage);
+                    // Empty stringBuilder for new message
+                    stringBuilder = new StringBuilder();
                 }
-                if (ConnectedToServer)
-                {
-                    CloseConnection();
-                }
+                if (ConnectedToServer) CloseConnection();
             }
             catch (Exception)
             {
-                if (ConnectedToServer)
-                {
-                    // Send error to chat and close connection
-                    AddMessageToChat("Onverwachte server fout");
-                    CloseConnection();
-                }
+                if (!ConnectedToServer) return;
+                // Send error to chat and close connection
+                AddMessageToChat("Onverwachte server fout");
+                CloseConnection();
             }
         }
 
@@ -118,13 +111,12 @@ namespace WpfAppClient
             SendMessage(message, Client);
         }
 
-
         /// <summary>
         /// Closed connection and reset settings
         /// </summary>
         public void CloseConnection()
         {
-            // inform server and close connection
+            // Inform server and close connection
             ConnectedToServer = false;
             Client.Close();
             Client.Dispose();

@@ -1,12 +1,8 @@
 ﻿using ChatForm;
 using System;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using WpfAppClient;
 
 namespace WpfAppClient
 {
@@ -31,8 +27,10 @@ namespace WpfAppClient
         /// </summary>
         private void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            if (IsServerStarterd()) CloseConnection();
-            if (!FieldsAreValid()) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
+            // If server is started close server
+            if (IsServerStarterd()) CloseConnection(); 
+            // Validate fields
+            if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; } 
             int PortNr = int.Parse(InputPortNumber.Text);
             int BufferSize = int.Parse(InputBufferSize.Text);
             AddToChatList("Connectie maken...");
@@ -46,13 +44,6 @@ namespace WpfAppClient
             UpdateBtnServerStart();
         }
 
-        private bool FieldsAreValid()
-        {
-            return ChatValidator.IsValidIP(InputServerIP.Text) &&
-                ChatValidator.IsValidPortNumber(InputPortNumber.Text) &&
-                ChatValidator.IsValidBufferSize(InputBufferSize.Text);
-        }
-
         private bool IsServerStarterd()
         {
             if (Client == null) return false;
@@ -63,7 +54,6 @@ namespace WpfAppClient
         {
             Client.CloseConnection();
         }
-
 
         /// <summary>
         /// <c>Event_Handler</c> BtnSendMessage Click
@@ -106,7 +96,7 @@ namespace WpfAppClient
         {
             Dispatcher.Invoke(() =>
             {
-                ListBoxItem item = new ListBoxItem { Content = message };
+                ListBoxItem item = new(){ Content = message };
                 ChatList.Items.Add(item);
                 // Scroll to item
                 ChatList.ScrollIntoView(item);

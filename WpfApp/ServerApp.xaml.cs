@@ -15,8 +15,8 @@ namespace WpfApp
     public partial class ServerApp : Window
     {
         private ChatServer Server;
-        private const string START_SERVER_TEXT = "Starten";
-        private const string CLOSE_SERVER_TEXT = "Sluiten";
+        protected const string START_SERVER_TEXT = "Starten";
+        protected const string CLOSE_SERVER_TEXT = "Sluiten";
 
         public ServerApp()
         {
@@ -35,11 +35,7 @@ namespace WpfApp
         private void StartServer()
         {
             if (IsServerStarted()) CloseConnection();
-            if (!FieldsAreValid())
-            {
-                UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw");
-                return;
-            }
+            if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             UpdateErrorDisplay();
             AddToChatList("Server Starten...");
             Server = new ChatServer(
@@ -48,7 +44,6 @@ namespace WpfApp
                 InputServerIP.Text,
                 (message) => AddToChatList(message),
                 () => UpdateBtnServerStart());
-
 
             try
             {
