@@ -6,7 +6,6 @@ namespace ChatForm
 {
     public static class ChatValidator
     {
-
         /// <summary>
         /// Checks if given string can be converted into an int and is its a valid number based on <code>IsValidPortNumber</code>
         /// </summary>

@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfAppServer", "WpfApp\WpfA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfAppClient", "WpfAppClient\WpfAppClient.csproj", "{20D3CBD9-26EE-4640-8C9E-6C39E2B6E5FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatForm", "ChatForm\ChatForm.csproj", "{E146711C-129F-4818-978F-725F62E62315}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatForm", "ChatForm\ChatForm.csproj", "{E146711C-129F-4818-978F-725F62E62315}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutionfiles", "Solutionfiles", "{12FF46CA-7511-42A6-BB58-169B2253073C}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
