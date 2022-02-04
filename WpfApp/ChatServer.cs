@@ -117,7 +117,7 @@ namespace WpfAppServer
                     RemoveClient(tcpClient);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (networkStream.CanRead)
                 {
