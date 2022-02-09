@@ -1,5 +1,6 @@
 ﻿using ChatForm;
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace WpfAppClient
         /// <summary>
         /// Method to connect to the server
         /// </summary>
-        public async void Connect()
+        public async Task ConnectAsync()
         {
             try
             {
@@ -52,16 +53,16 @@ namespace WpfAppClient
         /// <summary>
         /// 
         /// </summary>
-        private void ReceiveData()
+        private async void ReceiveData()
         {
             using NetworkStream networkStream = Client.GetStream();
             try
             {
-                while (true)
+                while (networkStream.CanRead)
                 {
                     // Receive data from stream
                     byte[] byteArray = new byte[BufferSize];
-                    int resultSize = networkStream.Read(byteArray, 0, BufferSize);
+                    int resultSize = await networkStream.ReadAsync(byteArray.AsMemory(0, BufferSize));
                     string message = Encoding.ASCII.GetString(byteArray, 0, resultSize);
 
                     // Make one message from received bytes
@@ -82,15 +83,21 @@ namespace WpfAppClient
                     // Empty stringBuilder for new message
                     stringBuilder = new StringBuilder();
                 }
-                if (ConnectedToServer) CloseConnection();
             }
-            catch (Exception)
+            catch (IOException e)
             {
-                if (!ConnectedToServer) return;
-                // Send error to chat and close connection
-                AddMessageToChatAction("Onverwachte server fout");
-                CloseConnection();
+                if (ConnectedToServer)
+                {
+                    // Send error to chat and close connection
+                    AddMessageToChatAction($"Communicatie fout: {e.Message}");
+                }
             }
+            catch (Exception e)
+            {
+                // Send error to chat and close connection
+                AddMessageToChatAction($"Onverwachte server fout: {e.GetType().Name}");
+            }
+            if (ConnectedToServer) CloseConnection();
         }
 
         internal bool IsServerStarted()
@@ -110,8 +117,8 @@ namespace WpfAppClient
         {
             // Inform server and close connection
             ConnectedToServer = false;
+            if (Client.Connected) SendMessage("bye");
             Client.Close();
-            Client.Dispose();
             // Update UI
             ToggleStartButtonAction();
             AddMessageToChatAction("Connectie gesloten");

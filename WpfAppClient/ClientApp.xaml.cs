@@ -1,5 +1,6 @@
 ﻿using ChatForm;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,10 +26,15 @@ namespace WpfAppClient
         /// <summary>
         /// <c>Event_Handler</c> BtnStartServer
         /// </summary>
-        private void BtnStartServer_Click(object sender, RoutedEventArgs e)
+        private async void BtnStartServer_Click(object sender, RoutedEventArgs e)
+        {
+            await ConnectToServer();
+        }
+
+        private async Task ConnectToServer()
         {
             // If server is started close server
-            if (IsServerStarterd()) CloseConnection();
+            if (IsServerStarterd()) { CloseConnection(); return; }
             // Validate fields
             if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             int PortNr = int.Parse(InputPortNumber.Text);
@@ -39,8 +45,8 @@ namespace WpfAppClient
                 InputServerIP.Text,
                 (message) => AddToChatList(message),
                 () => UpdateBtnServerStart());
-            Client.Connect();
-            AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
+            await Client.ConnectAsync();
+            if (IsServerStarterd()) AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
             UpdateBtnServerStart();
         }
 
@@ -62,17 +68,17 @@ namespace WpfAppClient
         {
             string message = InputMessage.Text;
             if (string.IsNullOrWhiteSpace(message)) { UpdateErrorDisplay("Vul een bericht in."); return; }
-            if (!IsServerStarterd())
-            {
-                UpdateErrorDisplay("Niet verbonden!");
-                return;
-            }
+            if (!IsServerStarterd()) { UpdateErrorDisplay("Niet verbonden!"); return; }
+
             // Update UI
             UpdateErrorDisplay();
             try
             {
                 Client.SendMessage(message);
-                AddToChatList(message);
+                if (message != "bye")
+                {
+                    AddToChatList(message);
+                }
             }
             catch (ArgumentException ex)
             {
