@@ -55,7 +55,7 @@ namespace WpfAppServer
             {
                 TcpClients.Add(tcpClient);
                 TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
-                await Task.Run(() => ReceiveData(tcpClient));
+                await Task.Run(() => ReceiveDataAsync(tcpClient));
             }
             catch (Exception e)
             {
@@ -65,7 +65,7 @@ namespace WpfAppServer
 
         }
 
-        private void ReceiveData(TcpClient tcpClient)
+        private async Task ReceiveDataAsync(TcpClient tcpClient)
         {
             StringBuilder stringBuilder = new();
             try
@@ -77,7 +77,7 @@ namespace WpfAppServer
                 {
                     // Receive data from stream
                     byte[] byteArray = new byte[BufferSize];
-                    int readByteSize = networkStream.Read(byteArray, 0, BufferSize);
+                    int readByteSize = await networkStream.ReadAsync(byteArray.AsMemory(0, BufferSize));
                     string message = Encoding.ASCII.GetString(byteArray, 0, readByteSize);
 
                     // Make one message from received bytes
@@ -134,6 +134,8 @@ namespace WpfAppServer
         /// <param name="tcpClient"></param>
         public void BroadCast(string clientMessage, TcpClient tcpClient)
         {
+            // Check for illegal argument
+            if (clientMessage.Contains(ENDOFTRANSITIONCHARACTER)) throw new ArgumentException("Verboden character");
             // Send message to all connected clients that are not the tcpClient
             foreach (TcpClient client in TcpClients.Where(client => client != tcpClient))
             {

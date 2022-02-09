@@ -54,7 +54,7 @@ namespace WpfApp
             }
             catch (SocketException exception)
             {
-                AddToChatList("Verbindings fout: "+exception.Message);
+                AddToChatList("Verbindings fout: " + exception.Message);
                 CloseConnection();
                 return;
             }
@@ -71,13 +71,24 @@ namespace WpfApp
         /// </summary>
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e)
         {
-            if (InputMessage.Text == "") UpdateErrorDisplay();
+            string message = InputMessage.Text;
+            if (string.IsNullOrWhiteSpace(message)) { UpdateErrorDisplay("Vul een bericht in."); return; }
             if (!IsServerStarted()) { UpdateErrorDisplay("Start eerst de server!"); return; }
 
-            string message = InputMessage.Text;
             UpdateErrorDisplay();
-            AddToChatList(message);
-            Server.BroadCast(message, null);
+            try
+            {
+                Server.BroadCast(message, null);
+                AddToChatList(message);
+            }
+            catch (ArgumentException ex)
+            {
+                UpdateErrorDisplay(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                UpdateErrorDisplay(ex.Message);
+            }
 
             if (message == "bye")
             {

@@ -28,19 +28,19 @@ namespace WpfAppClient
         private void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
             // If server is started close server
-            if (IsServerStarterd()) CloseConnection(); 
+            if (IsServerStarterd()) CloseConnection();
             // Validate fields
-            if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; } 
+            if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             int PortNr = int.Parse(InputPortNumber.Text);
             int BufferSize = int.Parse(InputBufferSize.Text);
             AddToChatList("Connectie maken...");
-            AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
             Client = new ChatClient(PortNr,
                 BufferSize,
                 InputServerIP.Text,
                 (message) => AddToChatList(message),
                 () => UpdateBtnServerStart());
             Client.Connect();
+            AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
             UpdateBtnServerStart();
         }
 
@@ -60,33 +60,36 @@ namespace WpfAppClient
         /// </summary>
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e)
         {
-            if (InputMessage.Text != "")
+            string message = InputMessage.Text;
+            if (string.IsNullOrWhiteSpace(message)) { UpdateErrorDisplay("Vul een bericht in."); return; }
+            if (!IsServerStarterd())
             {
-                if (IsServerStarterd())
-                {
-                    string message = InputMessage.Text;
-                    // Update UI
-                    UpdateErrorDisplay();
-                    AddToChatList(InputMessage.Text);
-                    // Send message tot server
-                    Client.SendMessage(InputMessage.Text);
-                    if (message == "bye")
-                    {
-                        CloseConnection();
-                    }
-                    // Empty message field
-                    InputMessage.Clear();
-                    InputMessage.Focus();
-                }
-                else
-                {
-                    UpdateErrorDisplay("Niet verbonden!");
-                }
+                UpdateErrorDisplay("Niet verbonden!");
+                return;
             }
-            else
+            // Update UI
+            UpdateErrorDisplay();
+            try
             {
-                UpdateErrorDisplay();
+                Client.SendMessage(message);
+                AddToChatList(message);
             }
+            catch (ArgumentException ex)
+            {
+                UpdateErrorDisplay(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                UpdateErrorDisplay(ex.Message);
+            }
+
+            if (message == "bye")
+            {
+                CloseConnection();
+            }
+            // Empty message field
+            InputMessage.Clear();
+            InputMessage.Focus();
         }
 
         /// <summary>
@@ -96,7 +99,7 @@ namespace WpfAppClient
         {
             Dispatcher.Invoke(() =>
             {
-                ListBoxItem item = new(){ Content = message };
+                ListBoxItem item = new() { Content = message };
                 ChatList.Items.Add(item);
                 // Scroll to item
                 ChatList.ScrollIntoView(item);

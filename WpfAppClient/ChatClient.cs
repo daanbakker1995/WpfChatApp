@@ -33,13 +33,13 @@ namespace WpfAppClient
         {
             try
             {
-                Client = new TcpClient(Ipaddres, PortNumber);
+                Client = new TcpClient();
+                await Client.ConnectAsync(Ipaddres, PortNumber);
                 // send feedback to chat
                 AddMessageToChatAction("Verbonden!");
                 ConnectedToServer = true;
                 // Make Client receivve data from server
                 await Task.Run(() => ReceiveData());
-
             }
             catch (Exception)
             {

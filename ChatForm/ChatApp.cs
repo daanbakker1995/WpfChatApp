@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ChatForm
 {
@@ -29,8 +30,9 @@ namespace ChatForm
         /// Sends message to connected server
         /// </summary>
         /// <param name="message"></param>
-        protected void SendMessage(String message, TcpClient client)
+        protected async void SendMessage(string message, TcpClient client)
         {
+            if (message.Contains(ENDOFTRANSITIONCHARACTER)) throw new ArgumentException("Verboden character");
             try
             {
                 // get Networkstream
@@ -39,7 +41,7 @@ namespace ChatForm
                 message += ENDOFTRANSITIONCHARACTER;
                 var buffer = Encoding.ASCII.GetBytes(message);
                 // Write message
-                stream.Write(buffer, 0, buffer.Length);
+                await stream.WriteAsync(buffer);
             }
             catch (Exception)
             {
