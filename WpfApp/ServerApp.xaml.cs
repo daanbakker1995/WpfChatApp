@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -35,7 +36,7 @@ namespace WpfApp
 
         private void StartServer()
         {
-            if (IsServerStarted()) CloseConnection();
+            if (IsServerStarted()) { CloseConnection(); return; }
             if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             UpdateErrorDisplay();
             AddToChatList("Server Starten...");
@@ -49,8 +50,8 @@ namespace WpfApp
             try
             {
                 Server.StartListening();
-                AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
                 UpdateBtnServerStart();
+                AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
             }
             catch (SocketException exception)
             {
