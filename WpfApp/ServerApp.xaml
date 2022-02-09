@@ -15,7 +15,7 @@
             <!-- Main -->
             <StackPanel Grid.Column="0" Margin="0 0 10 0">
                 <!-- ChatList -->
-                <ListBox x:Name="ChatList"  Margin="0 0 0 10" MinHeight="250" MaxHeight="250" Background="#FFC8C8C8"/>
+                <ListBox x:Name="ChatList" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  Margin="0 0 0 10" MinHeight="250" MaxHeight="250" Background="#FFC8C8C8" />
                 <!-- Input and Button -->
                 <Grid>
                     <Grid.ColumnDefinitions>

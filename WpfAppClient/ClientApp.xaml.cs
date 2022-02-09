@@ -80,7 +80,7 @@ namespace WpfAppClient
                 }
                 else
                 {
-                    UpdateErrorDisplay("Start eerst de server!");
+                    UpdateErrorDisplay("Niet verbonden!");
                 }
             }
             else

@@ -39,10 +39,7 @@ namespace ChatForm
         public static bool IsValidBufferSize(string BufferSize)
         {
             Regex RegMatch = new(@"^[0-9]*$"); // Regular expression for numbers
-            return RegMatch.IsMatch(BufferSize) &&
-            !string.IsNullOrEmpty(BufferSize) &&
-            int.TryParse(BufferSize, out int bufferSizeInt) &&
-            bufferSizeInt > 0;
+            return (RegMatch.IsMatch(BufferSize) && !string.IsNullOrEmpty(BufferSize) && int.TryParse(BufferSize, out int bufferSizeInt) &&  bufferSizeInt > 0);
         }
     }
 }

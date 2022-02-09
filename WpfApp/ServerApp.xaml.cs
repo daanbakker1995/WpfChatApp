@@ -1,6 +1,7 @@
 ﻿using ChatForm;
 using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,6 +52,12 @@ namespace WpfApp
                 AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
                 UpdateBtnServerStart();
             }
+            catch (SocketException exception)
+            {
+                AddToChatList("Verbindings fout: "+exception.Message);
+                CloseConnection();
+                return;
+            }
             catch (Exception exception)
             {
                 AddToChatList(exception.Message);
@@ -65,7 +72,7 @@ namespace WpfApp
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e)
         {
             if (InputMessage.Text == "") UpdateErrorDisplay();
-            if (!IsServerStarted()) UpdateErrorDisplay("Start eerst de server!");
+            if (!IsServerStarted()) { UpdateErrorDisplay("Start eerst de server!"); return; }
 
             string message = InputMessage.Text;
             UpdateErrorDisplay();

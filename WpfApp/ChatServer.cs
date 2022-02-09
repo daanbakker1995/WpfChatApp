@@ -50,8 +50,7 @@ namespace WpfAppServer
         private async void AcceptClients(IAsyncResult result)
         {
             if (!ServerStarted) return; // Return if server is not started
-            using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the TcpListener
-
+            using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the 
             try
             {
                 TcpClients.Add(tcpClient);
@@ -68,11 +67,10 @@ namespace WpfAppServer
 
         private void ReceiveData(TcpClient tcpClient)
         {
-            // Using streamwriter from the TCP Client
-            using NetworkStream networkStream = tcpClient.GetStream();
             StringBuilder stringBuilder = new();
             try
             {
+                using NetworkStream networkStream = tcpClient.GetStream();
                 // Send feedback to server UI
                 AddMessageToChatAction("Nieuwe chat deelnemer!");
                 while (networkStream != null && networkStream.CanRead)
@@ -99,12 +97,25 @@ namespace WpfAppServer
                 }
                 // Loop is broken so it can't read, remove client.
                 if (networkStream.CanRead) RemoveClient(tcpClient);
-
+                return;
+            }
+            catch (ObjectDisposedException e)
+            {
+                AddMessageToChatAction($"Object is verwijderd: {e.Message}");
+                RemoveClient(tcpClient);
+            }
+            catch (ArgumentNullException e)
+            {
+                AddMessageToChatAction($"Geen waarde voor verwerken bericht(en): {e.Message}");
+                RemoveClient(tcpClient);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                AddMessageToChatAction($"Fout bij het verwerken van bericht(en): {e.Message}");
+                RemoveClient(tcpClient);
             }
             catch (Exception)
             {
-                if (!networkStream.CanRead) return;
-                // Send error to chat and remove client
                 AddMessageToChatAction($"Fout bij ontvangen bericht(en)");
                 RemoveClient(tcpClient);
 
