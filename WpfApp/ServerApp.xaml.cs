@@ -29,12 +29,12 @@ namespace WpfApp
         /// <summary>
         /// <c>Event_Handler</c> BtnStartServer
         /// </summary>
-        private void BtnStartServer_Click(object sender, RoutedEventArgs e)
+        private async void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            StartServer();
+            await StartServer();
         }
 
-        private void StartServer()
+        private async Task StartServer()
         {
             if (IsServerStarted()) { CloseConnection(); return; }
             if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
@@ -49,9 +49,7 @@ namespace WpfApp
 
             try
             {
-                Server.StartListening();
-                UpdateBtnServerStart();
-                AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
+                await Server.StartListening();
             }
             catch (SocketException exception)
             {

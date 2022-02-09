@@ -30,7 +30,7 @@ namespace WpfAppServer
         {
         }
 
-        public void StartListening()
+        public async Task StartListening()
         {
             try
             {
@@ -38,32 +38,48 @@ namespace WpfAppServer
                 TcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
                 TcpListener.Start();
                 AddMessageToChatAction("Luisteren naar chatclients...");
-                TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener); // TODO: Make task
+                //TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
+
+                while (ServerStarted)
+                {
+                    TcpClient client = await TcpListener.AcceptTcpClientAsync();
+
+                    TcpClients.Add(client);
+                    UpdateStartButton();
+                    await Task.Run(() => ReceiveDataAsync(client));
+                }
             }
             catch (Exception e)
             {
                 ServerStarted = false;
                 throw new Exception($"Server Error: {e.Message}");
             }
+            finally
+            {
+                if (ServerStarted)
+                {
+                    CloseServer();
+                }
+            }
         }
 
-        private async void AcceptClients(IAsyncResult result)
-        {
-            if (!ServerStarted) return; // Return if server is not started
-            using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the 
-            try
-            {
-                TcpClients.Add(tcpClient);
-                TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
-                await Task.Run(() => ReceiveDataAsync(tcpClient));
-            }
-            catch (Exception e)
-            {
-                // Add exception to chat if server started and an exception caught
-                if (ServerStarted) AddMessageToChatAction("AcceptClients error:" + e.Message);
-            }
+        //private async void AcceptClients(IAsyncResult result)
+        //{
+        //    if (!ServerStarted) return; // Return if server is not started
+        //    using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the 
+        //    try
+        //    {
+        //        TcpClients.Add(tcpClient);
+        //        TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
+        //        await Task.Run(() => ReceiveDataAsync(tcpClient));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        // Add exception to chat if server started and an exception caught
+        //        if (ServerStarted) AddMessageToChatAction("AcceptClients error:" + e.Message);
+        //    }
 
-        }
+        //}
 
         private async Task ReceiveDataAsync(TcpClient tcpClient)
         {
@@ -167,7 +183,7 @@ namespace WpfAppServer
             // Reset list
             TcpClients.Clear();
             // Update UI
-            ToggleStartButtonAction();
+            UpdateStartButton();
             AddMessageToChatAction("Verbinding gesloten..");
         }
     }

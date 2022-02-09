@@ -46,7 +46,7 @@ namespace WpfAppClient
             {
                 AddMessageToChatAction("Fout bij maken connectie.");
                 ConnectedToServer = false;
-                ToggleStartButtonAction();
+                UpdateStartButton();
             }
         }
 
@@ -120,7 +120,7 @@ namespace WpfAppClient
             if (Client.Connected) SendMessage("bye");
             Client.Close();
             // Update UI
-            ToggleStartButtonAction();
+            UpdateStartButton();
             AddMessageToChatAction("Connectie gesloten");
         }
     }

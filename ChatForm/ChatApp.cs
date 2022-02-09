@@ -15,7 +15,7 @@ namespace ChatForm
 
         // Delegates/Actions to update UI
         protected Action<string> AddMessageToChatAction;
-        protected Action ToggleStartButtonAction;
+        protected Action UpdateStartButton;
 
         protected ChatApp(int PortNumber, int BufferSize, string Ipaddres, Action<string> AddMessageToChatAction, Action ToggleStartButtonAction)
         {
@@ -23,7 +23,7 @@ namespace ChatForm
             this.BufferSize = BufferSize;
             this.Ipaddres = Ipaddres;
             this.AddMessageToChatAction = AddMessageToChatAction;
-            this.ToggleStartButtonAction = ToggleStartButtonAction;
+            this.UpdateStartButton = ToggleStartButtonAction;
         }
 
         /// <summary>
