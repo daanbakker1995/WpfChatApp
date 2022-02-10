@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace WpfAppServer
@@ -30,44 +32,40 @@ namespace WpfAppServer
         {
         }
 
-        public async void Start()
+        public void Start()
         {
             try
             {
                 _tcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
                 _tcpListener.Start();
                 _serverStarted = true;
+            }catch (SocketException)
+            {
+                throw new Exception("Fout bij starten server.");
             }
             catch (Exception e)
             {
                 _serverStarted = false;
-                throw new Exception($"Server Error: {e.Message}");
+                throw new Exception($"Server Error: {e.GetType()}");
             }
         }
 
-        public async void AcceptClients()
+        public async Task AcceptClientsAsync()
         {
-            try
+            while (_serverStarted)
             {
-                while (_serverStarted)
+                try
                 {
                     TcpClient client = await _tcpListener.AcceptTcpClientAsync();
-
                     _tcpClients.Add(client);
-                    UpdateStartButton();
                     _ = Task.Run(() => ReceiveDataAsync(client));
                 }
-            }
-            catch (Exception e)
-            {
-                _serverStarted = false;
-                throw new Exception($"Server Error: {e.Message}");
-            }
-            finally
-            {
-                if (_serverStarted)
+                catch (Exception e)
                 {
+                    if (!_serverStarted) return;
+                    _serverStarted = false;
                     CloseServer();
+                    throw new Exception($"Server Error: {e.Message}");
                 }
             }
         }
@@ -106,27 +104,27 @@ namespace WpfAppServer
                 if (networkStream.CanRead) RemoveClient(tcpClient);
                 return;
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
-                AddMessageToChatAction($"Object is verwijderd: {e.Message}");
-                RemoveClient(tcpClient);
+                AddMessageToChatAction($"Client is niet bereikbaar");
+            }
+            catch (IOException)
+            {
+                AddMessageToChatAction($"Client is niet bereikbaar");
             }
             catch (ArgumentNullException e)
             {
                 AddMessageToChatAction($"Geen waarde voor verwerken bericht(en): {e.Message}");
-                RemoveClient(tcpClient);
             }
             catch (ArgumentOutOfRangeException e)
             {
                 AddMessageToChatAction($"Fout bij het verwerken van bericht(en): {e.Message}");
-                RemoveClient(tcpClient);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                AddMessageToChatAction($"Fout bij ontvangen bericht(en)");
-                RemoveClient(tcpClient);
-
+                AddMessageToChatAction($"Onverwachte fout ontvangen bericht(en){e.Message}");
             }
+            RemoveClient(tcpClient);
         }
 
         internal bool IsStarted()
@@ -156,7 +154,7 @@ namespace WpfAppServer
         /// <param name="client"></param>
         private void RemoveClient(TcpClient client)
         {
-            AddMessageToChatAction("Een client heeft chat verlaten");
+            AddMessageToChatAction("Verbinding met een client is verbroken.");
             // Close client and remove from List
             client.Close();
             _tcpClients.Remove(client);
@@ -170,7 +168,8 @@ namespace WpfAppServer
             // Send bye to clients and stop the listener
             _serverStarted = false;
             BroadCast("bye", null);
-            _tcpListener.Stop();
+            if (_tcpListener != null) _tcpListener.Stop();
+            _tcpListener = null;
             // Reset list
             _tcpClients.Clear();
             // Update UI

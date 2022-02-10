@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using WpfAppServer;
 
 namespace WpfApp
@@ -29,29 +30,43 @@ namespace WpfApp
         /// <summary>
         /// <c>Event_Handler</c> BtnStartServer
         /// </summary>
-        private async void BtnStartServer_Click(object sender, RoutedEventArgs e)
+        private void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
-            await StartServer();
+            StartServer();
         }
 
-        private async Task StartServer()
+        public void BtnClearChatList_Click(object sender, RoutedEventArgs e)
+        {
+            ChatList.Items.Clear();
+        }
+
+        /// <summary>
+        /// The main meth
+        /// </summary>
+        private async void StartServer()
         {
             if (IsServerStarted()) { CloseConnection(); return; }
-            if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
+            string ip = InputServerIP.Text;
+            string buffer = InputBufferSize.Text;
+            string port = InputPortNumber.Text;
+
+            if (!ChatValidator.FieldsAreValid(ip, port, buffer)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             UpdateErrorDisplay();
-            AddToChatList("Server Starten...");
+
+            AddToChatList($"Server Starten...");
             Server = new ChatServer(
-                int.Parse(InputPortNumber.Text),
-                int.Parse(InputBufferSize.Text),
-                InputServerIP.Text,
+                int.Parse(port),
+                int.Parse(buffer),
+                ip,
                 (message) => AddToChatList(message),
                 () => UpdateBtnServerStart());
 
             try
             {
                 Server.Start();
+                UpdateBtnServerStart();
                 AddToChatList("Luisteren naar chatclients...");
-                Server.AcceptClients();
+                await Server.AcceptClientsAsync();
             }
             catch (SocketException exception)
             {
@@ -68,7 +83,7 @@ namespace WpfApp
         }
 
         /// <summary>
-        /// <c>Event_Handler</c> BtnSendMessage Click
+        /// Event_Handler BtnSendMessage Click
         /// </summary>
         private void BtnSendMessage_Click(object sender, RoutedEventArgs e)
         {
@@ -101,12 +116,19 @@ namespace WpfApp
             _ = InputMessage.Focus();
         }
 
+        /// <summary>
+        /// Checks if there is a server and if its started.
+        /// </summary>
+        /// <returns></returns>
         private bool IsServerStarted()
         {
             if (Server == null) return false;
             return Server.IsStarted();
         }
 
+        /// <summary>
+        /// Closes the connection.
+        /// </summary>
         private void CloseConnection()
         {
             AddToChatList("Verbinding sluiten...");
@@ -142,7 +164,7 @@ namespace WpfApp
         {
             Dispatcher.Invoke(() =>
             {
-                BtnStartServer.Content = (BtnStartServer.Content.ToString() == START_SERVER_TEXT) ? CLOSE_SERVER_TEXT : START_SERVER_TEXT;
+                BtnStartServer.Content = IsServerStarted() ? CLOSE_SERVER_TEXT : START_SERVER_TEXT;
             });
         }
 

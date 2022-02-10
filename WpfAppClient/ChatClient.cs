@@ -44,7 +44,7 @@ namespace WpfAppClient
             }
             catch (Exception)
             {
-                AddMessageToChatAction("Fout bij maken connectie.");
+                AddMessageToChatAction($"Fout bij maken connectie.");
                 ConnectedToServer = false;
                 UpdateStartButton();
             }

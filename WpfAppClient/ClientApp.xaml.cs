@@ -35,6 +35,7 @@ namespace WpfAppClient
         {
             // If server is started close server
             if (IsServerStarterd()) { CloseConnection(); return; }
+            ChatList.Items.Clear();
             // Validate fields
             if (!ChatValidator.FieldsAreValid(InputServerIP.Text, InputBufferSize.Text, InputPortNumber.Text)) { UpdateErrorDisplay("Foute gegevens, controleer probeer opnieuw"); return; }
             int PortNr = int.Parse(InputPortNumber.Text);
@@ -46,8 +47,8 @@ namespace WpfAppClient
                 (message) => AddToChatList(message),
                 () => UpdateBtnServerStart());
             await Client.ConnectAsync();
-            if (IsServerStarterd()) AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
             UpdateBtnServerStart();
+            if (IsServerStarterd()) AddToChatList("Druk op 'Sluiten' of verzend 'bye' om connectie te sluiten");
         }
 
         private bool IsServerStarterd()

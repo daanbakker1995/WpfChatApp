@@ -8,9 +8,7 @@ namespace ChatForm
     {
         public static bool FieldsAreValid(string IpAdress, string Portnumber, string Buffersize)
         {
-            return IsValidIP(IpAdress) &&
-                IsValidPortNumber(Portnumber) &&
-                IsValidBufferSize(Buffersize);
+            return IsValidIP(IpAdress) && IsValidPortNumber(Portnumber) && IsValidBufferSize(Buffersize);
         }
 
         /// <summary>
@@ -20,7 +18,7 @@ namespace ChatForm
         /// <returns></returns>
         public static bool IsValidPortNumber(string portNr)
         {
-            return (portNr != "") && int.TryParse(portNr, out _);
+            return (portNr != "") && int.TryParse(portNr, out int portnummer) && portnummer > 0;
         }
 
         /// <summary>
@@ -38,8 +36,16 @@ namespace ChatForm
 
         public static bool IsValidBufferSize(string BufferSize)
         {
+            if (string.IsNullOrEmpty(BufferSize)) return false;
+
             Regex RegMatch = new(@"^[0-9]*$"); // Regular expression for numbers
-            return (RegMatch.IsMatch(BufferSize) && !string.IsNullOrEmpty(BufferSize) && int.TryParse(BufferSize, out int bufferSizeInt) &&  bufferSizeInt > 0);
+            if (!RegMatch.IsMatch(BufferSize)) return false;
+
+            if (!int.TryParse(BufferSize, out int bufferSizeInt) || bufferSizeInt <= 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
