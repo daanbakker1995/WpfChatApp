@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Chat Server" FontSize="12" Width="450" Height="370" MinHeight="370" MinWidth="450"  Background="#FF222428">
+        Title="Chat Server" FontSize="12" Width="450" Height="370" MinHeight="370" MinWidth="450"  Background="#1E1E1E">
     <Border Padding="10" x:Name="WindowBorder">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -15,7 +15,7 @@
             <!-- Main -->
             <StackPanel Grid.Column="0" Margin="0 0 10 0">
                 <!-- ChatList -->
-                <ListBox x:Name="ChatList" Margin="0 0 0 10" MinHeight="250" MaxHeight="250" Background="#FFC8C8C8" />
+                <ListBox x:Name="ChatList" Margin="0 0 0 10" MinHeight="250" MaxHeight="250" Background="#E3E3E3" />
                 <!-- Input and Button -->
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -23,9 +23,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <!-- Input -->
-                    <TextBox x:Name="InputMessage" Grid.Column="0" Margin="0 0 5 0" Background="#FFC8C8C8"/>
+                    <TextBox x:Name="InputMessage" Grid.Column="0" Margin="0 0 5 0" Background="#E3E3E3"/>
                     <!-- Button -->
-                    <Button x:Name="BtnSendMessage" Click="BtnSendMessage_Click" Content="Verzenden" Grid.Column="1" Padding="3" Background="#FF323232" Foreground="#FFEEEEEE" BorderBrush="#FF353535"/>
+                    <Button x:Name="BtnSendMessage" Click="BtnSendMessage_Click" Content="Verzenden" Grid.Column="1" Padding="3" Background="#3b2e58" Foreground="#FFEEEEEE" BorderBrush="#FF353535"/>
                 </Grid>
             </StackPanel>
 
@@ -37,24 +37,24 @@
                 <!-- ServerIP Label-->
                 <Label Content="Server IP" Padding="0 2" Foreground="#FFEEEEEE"/>
                 <!-- ServerIP Input-->
-                <TextBox x:Name="InputServerIP" Text="127.0.0.1" Padding="2" Margin="0,0,0,10" KeyUp="InputServerIP_KeyUp" Background="#FFC8C8C8"/>
+                <TextBox x:Name="InputServerIP" Text="127.0.0.1" Padding="2" Margin="0,0,0,10" KeyUp="InputServerIP_KeyUp" Background="#E3E3E3"/>
 
                 <!-- PortNumber Label-->
                 <Label Content="Port nummer" Padding="0 2" Foreground="#FFEEEEEE"/>
                 <!-- PortNumber Input-->
-                <TextBox x:Name="InputPortNumber" Text="49152" MaxLength="5" Padding="2" Margin="0,0,0,10" KeyUp="InputPortNumber_KeyUp" Background="#FFC8C8C8"/>
+                <TextBox x:Name="InputPortNumber" Text="49152" MaxLength="5" Padding="2" Margin="0,0,0,10" KeyUp="InputPortNumber_KeyUp" Background="#E3E3E3"/>
 
                 <!-- BufferSize Label-->
                 <Label Content="Buffer grootte" Padding="0 2" Foreground="#FFEEEEEE"/>
                 <!-- BufferSize Input-->
-                <TextBox x:Name="InputBufferSize" Text="1024" Padding="2" Margin="0,0,0,10" KeyUp="InputBufferSize_KeyUp" Background="#FFC8C8C8"/>
+                <TextBox x:Name="InputBufferSize" Text="1024" Padding="2" Margin="0,0,0,10" KeyUp="InputBufferSize_KeyUp" Background="#E3E3E3"/>
 
                 <!-- Start server button -->
-                <Button x:Name="BtnStartServer" Click="BtnStartServer_Click" Content="Starten" Background="#FF323232" Foreground="#FFEEEEEE" BorderBrush="#FF353535" Padding="3" Margin="0,10,0,0"/>
+                <Button x:Name="BtnStartServer" Click="BtnStartServer_Click" Content="Starten" Background="#3b2e58" Foreground="#FFEEEEEE" BorderBrush="#FF353535" Padding="3" Margin="0,10,0,0"/>
                 <Button x:Name="BtnClearChatList" Click="BtnClearChatList_Click" Content="Leeg chatvenster" Background="#FF323232" Foreground="#FFEEEEEE" BorderBrush="#FF353535" Padding="5" Margin="0,10,0,0"/>
                 
                 <!-- Error Message -->
-                <TextBlock x:Name="ErrorTextBlock" Text="" Foreground="#FFF96E6E" Padding="2" Height="51" TextWrapping="Wrap"/>
+                <TextBlock x:Name="ErrorTextBlock" Text="" Foreground="#C41D1D" Padding="2" Height="51" TextWrapping="Wrap"/>
             </StackPanel>
         </Grid>
     </Border>

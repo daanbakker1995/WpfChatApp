@@ -5,7 +5,12 @@
 		<TargetFramework>net5.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<StartupObject></StartupObject>
+		<ApplicationIcon>Visual_Studio_icon-icons.com_56597.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="Visual_Studio_icon-icons.com_56597.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ChatForm\ChatForm.csproj" />
