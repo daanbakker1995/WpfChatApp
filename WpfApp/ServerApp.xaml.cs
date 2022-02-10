@@ -49,7 +49,9 @@ namespace WpfApp
 
             try
             {
-                await Server.StartListening();
+                Server.Start();
+                AddToChatList("Luisteren naar chatclients...");
+                Server.AcceptClients();
             }
             catch (SocketException exception)
             {

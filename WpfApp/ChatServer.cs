@@ -12,11 +12,11 @@ namespace WpfAppServer
     class ChatServer : ChatApp
     {
         // TcpListener for listening for clients
-        private TcpListener TcpListener = null;
+        private TcpListener _tcpListener = null;
         // List of TcpCLients
-        private List<TcpClient> TcpClients = new();
+        private List<TcpClient> _tcpClients = new();
         // boolean holding the Server Status
-        private bool ServerStarted { get; set; } = false;
+        private bool _serverStarted { get; set; } = false;
 
         /// <summary>
         /// Constructor
@@ -30,56 +30,47 @@ namespace WpfAppServer
         {
         }
 
-        public async Task StartListening()
+        public async void Start()
         {
             try
             {
-                ServerStarted = true;
-                TcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
-                TcpListener.Start();
-                AddMessageToChatAction("Luisteren naar chatclients...");
-                //TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
+                _tcpListener = new TcpListener(IPAddress.Parse(Ipaddres), PortNumber);
+                _tcpListener.Start();
+                _serverStarted = true;
+            }
+            catch (Exception e)
+            {
+                _serverStarted = false;
+                throw new Exception($"Server Error: {e.Message}");
+            }
+        }
 
-                while (ServerStarted)
+        public async void AcceptClients()
+        {
+            try
+            {
+                while (_serverStarted)
                 {
-                    TcpClient client = await TcpListener.AcceptTcpClientAsync();
+                    TcpClient client = await _tcpListener.AcceptTcpClientAsync();
 
-                    TcpClients.Add(client);
+                    _tcpClients.Add(client);
                     UpdateStartButton();
-                    await Task.Run(() => ReceiveDataAsync(client));
+                    _ = Task.Run(() => ReceiveDataAsync(client));
                 }
             }
             catch (Exception e)
             {
-                ServerStarted = false;
+                _serverStarted = false;
                 throw new Exception($"Server Error: {e.Message}");
             }
             finally
             {
-                if (ServerStarted)
+                if (_serverStarted)
                 {
                     CloseServer();
                 }
             }
         }
-
-        //private async void AcceptClients(IAsyncResult result)
-        //{
-        //    if (!ServerStarted) return; // Return if server is not started
-        //    using TcpClient tcpClient = TcpListener.EndAcceptTcpClient(result); // Use the returned TCP client from the 
-        //    try
-        //    {
-        //        TcpClients.Add(tcpClient);
-        //        TcpListener.BeginAcceptTcpClient(AcceptClients, TcpListener);
-        //        await Task.Run(() => ReceiveDataAsync(tcpClient));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        // Add exception to chat if server started and an exception caught
-        //        if (ServerStarted) AddMessageToChatAction("AcceptClients error:" + e.Message);
-        //    }
-
-        //}
 
         private async Task ReceiveDataAsync(TcpClient tcpClient)
         {
@@ -140,7 +131,7 @@ namespace WpfAppServer
 
         internal bool IsStarted()
         {
-            return ServerStarted;
+            return _serverStarted;
         }
 
         /// <summary>
@@ -153,7 +144,7 @@ namespace WpfAppServer
             // Check for illegal argument
             if (clientMessage.Contains(ENDOFTRANSITIONCHARACTER)) throw new ArgumentException("Verboden character");
             // Send message to all connected clients that are not the tcpClient
-            foreach (TcpClient client in TcpClients.Where(client => client != tcpClient))
+            foreach (TcpClient client in _tcpClients.Where(client => client != tcpClient))
             {
                 SendMessage(clientMessage, client);
             }
@@ -168,7 +159,7 @@ namespace WpfAppServer
             AddMessageToChatAction("Een client heeft chat verlaten");
             // Close client and remove from List
             client.Close();
-            TcpClients.Remove(client);
+            _tcpClients.Remove(client);
         }
 
         /// <summary>
@@ -177,11 +168,11 @@ namespace WpfAppServer
         public void CloseServer()
         {
             // Send bye to clients and stop the listener
-            ServerStarted = false;
+            _serverStarted = false;
             BroadCast("bye", null);
-            TcpListener.Stop();
+            _tcpListener.Stop();
             // Reset list
-            TcpClients.Clear();
+            _tcpClients.Clear();
             // Update UI
             UpdateStartButton();
             AddMessageToChatAction("Verbinding gesloten..");
