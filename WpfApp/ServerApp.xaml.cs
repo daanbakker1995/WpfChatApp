@@ -10,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WpfAppServer;
 
-namespace WpfApp
+namespace WpfServer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
