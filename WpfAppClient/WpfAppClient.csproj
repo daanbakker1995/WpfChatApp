@@ -13,7 +13,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ChatForm\ChatForm.csproj" />
-	  <ProjectReference Include="..\WpfApp\WpfAppServer.csproj" />
 	</ItemGroup>
 
 </Project>

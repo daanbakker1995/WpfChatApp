@@ -44,12 +44,12 @@
                 <!-- PortNumber Label-->
                 <Label Content="Port nummer" Padding="0 2" Foreground="#FFEEEEEE"/>
                 <!-- PortNumber Input-->
-                <TextBox x:Name="InputPortNumber" Text="49152" MaxLength="5" Padding="2" Margin="0,0,0,10" KeyUp="InputPortNumber_KeyUp" Background="#E3E3E3"/>
+                <TextBox x:Name="InputPortNumber" Text="8080" MaxLength="5" Padding="2" Margin="0,0,0,10" KeyUp="InputPortNumber_KeyUp" Background="#E3E3E3"/>
 
                 <!-- BufferSize Label-->
                 <Label Content="Buffer grootte" Padding="0 2" Foreground="#FFEEEEEE"/>
                 <!-- BufferSize Input-->
-                <TextBox x:Name="InputBufferSize" Text="1024" Padding="2" Margin="0,0,0,10" KeyUp="InputBufferSize_KeyUp" Background="#E3E3E3"/>
+                <TextBox x:Name="InputBufferSize" Text="2" Padding="2" Margin="0,0,0,10" KeyUp="InputBufferSize_KeyUp" Background="#E3E3E3"/>
 
                 <!-- Start server button -->
                 <Button x:Name="BtnStartServer" Content="Verbind" Click="BtnStartServer_Click" Background="#3b2e58" Foreground="#FFEEEEEE" BorderBrush="#FF353535" Padding="3" Margin="0,10,0,0"/>

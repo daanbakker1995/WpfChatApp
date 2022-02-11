@@ -55,47 +55,54 @@ namespace WpfAppClient
         /// </summary>
         private async void ReceiveData()
         {
-            using NetworkStream networkStream = Client.GetStream();
+
+            StringBuilder stringBuilder = new();
             try
             {
-                while (networkStream.CanRead)
+                using NetworkStream networkStream = Client.GetStream();
+                // Send feedback to server UI
+                AddMessageToChatAction("Nieuwe chat deelnemer!");
+                while (networkStream != null && networkStream.CanRead)
                 {
                     // Receive data from stream
                     byte[] byteArray = new byte[BufferSize];
-                    int resultSize = await networkStream.ReadAsync(byteArray.AsMemory(0, BufferSize));
-                    string message = Encoding.ASCII.GetString(byteArray, 0, resultSize);
+                    int readByteSize = await networkStream.ReadAsync(byteArray.AsMemory(0, BufferSize));
+                    string message = Encoding.ASCII.GetString(byteArray, 0, readByteSize);
 
                     // Make one message from received bytes
-                    StringBuilder stringBuilder = new();
-                    stringBuilder.Append(message);
+                    stringBuilder = stringBuilder.Append(message);
 
-                    // if end of message is not end of transmition character continue to receive data.
-                    if (!message.EndsWith(ENDOFTRANSITIONCHARACTER)) continue;
+                    //end of Message
+                    if (networkStream.DataAvailable) continue;
 
                     // Make message readable
                     string clientMessage = stringBuilder.ToString();
-                    clientMessage = clientMessage.Remove(clientMessage.Length - ENDOFTRANSITIONCHARACTER.Length);
-                    // If received message is bye the server is closed so the client so break connection.
-                    if (clientMessage == "bye")
-                        break;
+                    if (clientMessage == "bye") break;
                     // Display message in chat
                     AddMessageToChatAction(clientMessage);
-                    // Empty stringBuilder for new message
-                    stringBuilder = new StringBuilder();
+                    // Send message to other connected clients
+                    stringBuilder.Clear();
                 }
             }
-            catch (IOException e)
+            catch (ObjectDisposedException)
             {
-                if (ConnectedToServer)
-                {
-                    // Send error to chat and close connection
-                    AddMessageToChatAction($"Communicatie fout: {e.Message}");
-                }
+                AddMessageToChatAction($"Client is niet bereikbaar");
+            }
+            catch (IOException)
+            {
+                AddMessageToChatAction($"Client is niet bereikbaar");
+            }
+            catch (ArgumentNullException e)
+            {
+                AddMessageToChatAction($"Geen waarde voor verwerken bericht(en): {e.Message}");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                AddMessageToChatAction($"Fout bij het verwerken van bericht(en): {e.Message}");
             }
             catch (Exception e)
             {
-                // Send error to chat and close connection
-                AddMessageToChatAction($"Onverwachte server fout: {e.GetType().Name}");
+                AddMessageToChatAction($"Onverwachte fout ontvangen bericht(en){e.Message}");
             }
             if (ConnectedToServer) CloseConnection();
         }

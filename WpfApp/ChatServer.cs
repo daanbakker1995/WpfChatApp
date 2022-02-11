@@ -89,10 +89,10 @@ namespace WpfAppServer
                     stringBuilder = stringBuilder.Append(message);
 
                     //end of Message
-                    if (!message.EndsWith(ENDOFTRANSITIONCHARACTER)) continue;
+                    if (networkStream.DataAvailable) continue;
+
                     // Make message readable
                     string clientMessage = stringBuilder.ToString();
-                    clientMessage = clientMessage.Remove(clientMessage.Length - ENDOFTRANSITIONCHARACTER.Length);
                     if (clientMessage == "bye") break;
                     // Display message in chat
                     AddMessageToChatAction(clientMessage);
@@ -139,8 +139,6 @@ namespace WpfAppServer
         /// <param name="tcpClient"></param>
         public void BroadCast(string clientMessage, TcpClient tcpClient)
         {
-            // Check for illegal argument
-            if (clientMessage.Contains(ENDOFTRANSITIONCHARACTER)) throw new ArgumentException("Verboden character");
             // Send message to all connected clients that are not the tcpClient
             foreach (TcpClient client in _tcpClients.Where(client => client != tcpClient))
             {

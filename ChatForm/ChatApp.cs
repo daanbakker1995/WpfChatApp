@@ -11,7 +11,6 @@ namespace ChatForm
         protected int PortNumber { get; set; }
         protected int BufferSize { get; set; }
         protected string Ipaddres { get; set; }
-        protected readonly string ENDOFTRANSITIONCHARACTER = "@-_@";
 
         // Delegates/Actions to update UI
         protected Action<string> AddMessageToChatAction;
@@ -32,13 +31,11 @@ namespace ChatForm
         /// <param name="message"></param>
         protected async void SendMessage(string message, TcpClient client)
         {
-            if (message.Contains(ENDOFTRANSITIONCHARACTER)) throw new ArgumentException("Verboden character");
             try
             {
                 // get Networkstream
                 var stream = client.GetStream();
                 // Make message ready to send
-                message += ENDOFTRANSITIONCHARACTER;
                 var buffer = Encoding.ASCII.GetBytes(message);
                 // Write message
                 await stream.WriteAsync(buffer);
